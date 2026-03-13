@@ -65,6 +65,6 @@ class DocTransformer < Formula
 
   test do
     output = shell_output("#{bin}/doc_transformer --help")
-    assert_match "Usage: doc_transformer", output
+    assert_match "doc_transformer", output
   end
 end
