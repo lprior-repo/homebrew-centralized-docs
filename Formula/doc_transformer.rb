@@ -13,7 +13,6 @@ class DocTransformer < Formula
   version "6.1.0"
   license "MIT"
 
-  # Only Apple Silicon is supported (Mac Intel cross-compilation is broken)
   on_macos do
     on_arm do
       url "https://github.com/lprior-repo/centralized-docs/releases/download/v#{version}/doc_transformer-v#{version}-macos-aarch64.tar.gz"
@@ -21,12 +20,36 @@ class DocTransformer < Formula
     end
 
     on_intel do
-      # Mac Intel not supported - requires building from source
-      # See: https://github.com/lprior-repo/centralized-docs
-      def caveats
-        <<~EOS
-          Mac Intel builds are not available as precompiled binaries.
-          Please build from source:
+      # Use a dummy URL that will fail with a clear message
+      url "https://github.com/lprior-repo/centralized-docs/releases/download/v#{version}/doc_transformer-v#{version}-macos-x86_64.tar.gz"
+      sha256 "0000000000000000000000000000000000000000000000000000000000000000"
+
+      def install
+        odie <<~EOS
+          Mac Intel (x86_64) precompiled binaries are not available.
+
+          To build from source:
+            git clone https://github.com/lprior-repo/centralized-docs
+            cd centralized-docs
+            rustup target add x86_64-apple-darwin
+            moon run :build
+
+          Or use Rosetta 2 with the ARM binary.
+        EOS
+      end
+    end
+  end
+
+  on_linux do
+    if Hardware::CPU.intel?
+      url "https://github.com/lprior-repo/centralized-docs/releases/download/v#{version}/doc_transformer-v#{version}-linux-x86_64.tar.gz"
+      sha256 "50e3b50adee4eb48a3ee11771f5a17cef2962c544c900ade6e7d46b6deb62319"
+    else
+      def install
+        odie <<~EOS
+          Linux ARM builds are not available as precompiled binaries.
+
+          To build from source:
             git clone https://github.com/lprior-repo/centralized-docs
             cd centralized-docs
             moon run :build
@@ -37,9 +60,11 @@ class DocTransformer < Formula
 
   def install
     bin.install "doc_transformer"
+    bin.install "llms_txt_validator" if File.exist?("llms_txt_validator")
   end
 
   test do
-    assert_match "doc_transformer", shell_output("#{bin}/doc_transformer --help")
+    output = shell_output("#{bin}/doc_transformer --help")
+    assert_match "Usage: doc_transformer", output
   end
 end

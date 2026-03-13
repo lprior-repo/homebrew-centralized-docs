@@ -24,10 +24,30 @@ doc_transformer search ./output "query"
 
 ## Supported Platforms
 
-- **macOS (Apple Silicon)** - Precompiled binary available
-- **macOS (Intel)** - Build from source required
-- **Linux (x86_64)** - Download from [releases](https://github.com/lprior-repo/centralized-docs/releases)
-- **Windows (x86_64)** - Download from [releases](https://github.com/lprior-repo/centralized-docs/releases)
+| Platform | Precompiled Binary | Notes |
+|----------|-------------------|-------|
+| macOS ARM (M1/M2/M3) | ✅ Yes | `brew install` works |
+| macOS Intel (x86_64) | ❌ No | Build from source required |
+| Linux x86_64 | ✅ Yes | `brew install` works |
+| Linux ARM | ❌ No | Build from source required |
+| Windows x86_64 | ⚠️ Manual | Download from [releases](https://github.com/lprior-repo/centralized-docs/releases) |
+
+## Building from Source
+
+If your platform doesn't have a precompiled binary:
+
+```bash
+git clone https://github.com/lprior-repo/centralized-docs
+cd centralized-docs
+
+# Install moon (build tool)
+npm install -g @moonrepo/cli
+
+# Build
+moon run :build
+
+# Binary will be at target/<your-target>/release/doc_transformer
+```
 
 ## What's this?
 
